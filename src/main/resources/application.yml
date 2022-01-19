@@ -1,0 +1,15 @@
+server:
+  servlet:
+    context-path: /
+spring:
+  data:
+    rest:
+      base-path: /api
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: 87d75d02f4fa36e37b9913f3ea2d7567d4e6fd39ba8168b8455ec68feeea8973
+    url: jdbc:postgresql://ec2-3-232-22-121.compute-1.amazonaws.com:5432/dbd5d1dv49s9if
+    username: djubyrqrqedjoi
+  jpa:
+    hibernate:
+      ddl-auto: create
