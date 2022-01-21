@@ -1,5 +1,6 @@
 package com.fsoft.quizsystem.object.entity;
 
+import com.fsoft.quizsystem.object.constant.QuizStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,9 +28,15 @@ public class Quiz {
     @Column(columnDefinition = "text")
     private String image;
 
+    @Enumerated(EnumType.STRING)
+    private QuizStatus status;
+
     @ManyToOne @JoinColumn(name = "category_id")
     private Category category;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL) @ToString.Exclude
     private List<Question> questions;
+
+    @ManyToOne @JoinColumn(name = "instructor_id")
+    private User instructor;
 }

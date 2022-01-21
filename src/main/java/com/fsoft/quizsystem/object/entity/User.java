@@ -4,10 +4,13 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class User implements UserDetails {
+public class User implements UserDetails, OAuth2User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
@@ -47,7 +50,15 @@ public class User implements UserDetails {
     @ManyToOne @JoinColumn(name = "role_id")
     private Role role;
 
+    @OneToMany(mappedBy = "instructor") @ToString.Exclude
+    private Set<Quiz> quizSet;
+
     private Boolean status;
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return null;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -74,5 +85,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return status;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }

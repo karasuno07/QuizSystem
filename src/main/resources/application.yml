@@ -2,6 +2,10 @@ server:
   servlet:
     context-path: /
 spring:
+  redis:
+    client-name: master
+    password: fsoft123456789
+    url: redis://redis-19207.c292.ap-southeast-1-1.ec2.cloud.redislabs.com:19207
   data:
     rest:
       base-path: /api
@@ -12,4 +16,8 @@ spring:
     username: djubyrqrqedjoi
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+token:
+  jwt:
+    secret-key: 3618bf61-a667-4139-ac23-4267323e6217
+    expiration-time: 300000
