@@ -1,20 +1,23 @@
 package com.fsoft.quizsystem.object.entity;
 
 import lombok.*;
+import org.hibernate.envers.Audited;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
+@Audited
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,19 +29,16 @@ public class User implements UserDetails, OAuth2User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(columnDefinition = "varchar(50)", nullable = false)
+    @Column(columnDefinition = "varchar(50)", nullable = false, unique = true)
     private String username;
 
     @Column(columnDefinition = "varchar(80)", nullable = false)
     private String password;
 
     @Column(columnDefinition = "varchar(50)", nullable = false)
-    private String firstName;
+    private String fullName;
 
-    @Column(columnDefinition = "varchar(50)", nullable = false)
-    private String lastName;
-
-    @Column(columnDefinition = "varchar(100)")
+    @Column(columnDefinition = "varchar(100)", unique = true)
     private String email;
 
     @Column(columnDefinition = "varchar(12)")
@@ -53,7 +53,7 @@ public class User implements UserDetails, OAuth2User {
     @OneToMany(mappedBy = "instructor") @ToString.Exclude
     private Set<Quiz> quizSet;
 
-    private Boolean status;
+    private Boolean status = true;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -62,9 +62,13 @@ public class User implements UserDetails, OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(role.getAuthorities().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        if (ObjectUtils.isEmpty(role)) {
+            return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
+        return role.getAuthorities().stream()
+                   .map(authority -> new SimpleGrantedAuthority(authority.name()))
+                   .collect(Collectors.toSet());
     }
 
     @Override

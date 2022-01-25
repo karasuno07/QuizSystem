@@ -1,12 +1,14 @@
 package com.fsoft.quizsystem.object.entity;
 
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "users_quizs")
+@Audited
 @Getter
 @Setter
 @NoArgsConstructor

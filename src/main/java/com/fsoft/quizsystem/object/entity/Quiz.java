@@ -2,12 +2,14 @@ package com.fsoft.quizsystem.object.entity;
 
 import com.fsoft.quizsystem.object.constant.QuizStatus;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "quizzes")
+@Audited
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,4 +41,9 @@ public class Quiz {
 
     @ManyToOne @JoinColumn(name = "instructor_id")
     private User instructor;
+
+    @PostPersist
+    public void postPersist() {
+        status = QuizStatus.DRAFT;
+    }
 }

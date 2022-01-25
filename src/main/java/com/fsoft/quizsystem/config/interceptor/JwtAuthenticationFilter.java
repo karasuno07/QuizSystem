@@ -1,4 +1,4 @@
-package com.fsoft.quizsystem.config.filter;
+package com.fsoft.quizsystem.config.interceptor;
 
 import com.fsoft.quizsystem.object.dto.response.AuthenticationInfo;
 import com.fsoft.quizsystem.service.JwtService;

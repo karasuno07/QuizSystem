@@ -1,11 +1,15 @@
 package com.fsoft.quizsystem.object.entity;
 
+import com.fsoft.quizsystem.object.constant.SystemAuthorities;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "roles")
+@Audited
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,5 +25,7 @@ public class Role {
     private String name;
 
     @Column(columnDefinition = "text")
-    private String authorities;
+    @Enumerated
+    @ElementCollection(targetClass = SystemAuthorities.class)
+    private Set<SystemAuthorities> authorities;
 }

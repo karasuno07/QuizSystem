@@ -19,6 +19,7 @@ import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -49,10 +50,15 @@ public class JwtService {
     }
 
     public String generateAccessToken(@NonNull User user) {
-        AuthenticationInfo authInfo = userMapper.entityToAuthInfo(user);
-
         Map<String, Object> payload = new HashMap<>();
-        payload.put("authInfo", authInfo);
+        payload.put("id", user.getId());
+        payload.put("username", user.getUsername());
+        if (!ObjectUtils.isEmpty(user.getRole())) {
+            payload.put("role", user.getRole().getName());
+            if (!ObjectUtils.isEmpty(user.getRole().getAuthorities())) {
+                payload.put("permissions", user.getRole().getAuthorities());
+            }
+        }
 
         JWTCreator.Builder builder = JWT.create();
         builder.withKeyId(UUID.randomUUID().toString())
@@ -70,7 +76,13 @@ public class JwtService {
         Payload payload = new JWTParser().parsePayload(json);
         Map<String, Claim> claims = payload.getClaims();
 
-        return claims.get("authInfo").as(AuthenticationInfo.class);
+        AuthenticationInfo authInfo = new AuthenticationInfo();
+        authInfo.setId(claims.get("id").asInt());
+        authInfo.setUsername(claims.get("username").asString());
+        authInfo.setRoleName(claims.get("role").asString());
+        authInfo.setPermissions(new HashSet<>(claims.get("permissions").asList(String.class)));
+
+        return authInfo;
     }
 
     public boolean validateToken(String authToken) {

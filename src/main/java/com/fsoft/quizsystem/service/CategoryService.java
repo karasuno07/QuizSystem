@@ -1,0 +1,21 @@
+package com.fsoft.quizsystem.service;
+
+import com.fsoft.quizsystem.object.entity.Category;
+import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
+import com.fsoft.quizsystem.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+@Log4j2
+public class CategoryService {
+
+    private final CategoryRepository categoryRepository;
+
+    public Category findCategoryById(long id) {
+        return categoryRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Not found any category with id " + id));
+    }
+}

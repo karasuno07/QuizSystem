@@ -1,11 +1,13 @@
 package com.fsoft.quizsystem.object.entity;
 
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "answers")
+@Audited
 @Getter
 @Setter
 @NoArgsConstructor

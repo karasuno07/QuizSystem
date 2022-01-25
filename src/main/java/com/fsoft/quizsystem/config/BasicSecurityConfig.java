@@ -1,6 +1,6 @@
 package com.fsoft.quizsystem.config;
 
-import com.fsoft.quizsystem.config.filter.JwtAuthenticationFilter;
+import com.fsoft.quizsystem.config.interceptor.JwtAuthenticationFilter;
 import com.fsoft.quizsystem.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -3,17 +3,21 @@ package com.fsoft.quizsystem.object.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
-public class AuthenticationInfo {
+public class UserResponse {
 
-    private long id;
+    private Long id;
 
     private String username;
 
+    private String fullName;
+
+    private String email;
+
+    private String phoneNumber;
+
+    private String image;
+
     @JsonProperty("role")
     private String roleName;
-
-    private Set<String> permissions;
 }

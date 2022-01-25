@@ -3,12 +3,14 @@ package com.fsoft.quizsystem.object.entity;
 import com.fsoft.quizsystem.object.constant.DifficultyLevel;
 import com.fsoft.quizsystem.object.constant.DifficultyPoint;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
 @Table(name = "difficulties")
+@Audited
 @Getter
 @Setter
 @NoArgsConstructor
