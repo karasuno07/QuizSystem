@@ -18,9 +18,10 @@ public class Category {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "varchar(50)", nullable = false)
     private String name;
 
+    @Column(columnDefinition = "text")
     private String image;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL) @ToString.Exclude

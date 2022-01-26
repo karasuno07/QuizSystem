@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/quiz")
+@RequestMapping("/api/v1/quizzes")
 @RequiredArgsConstructor
 public class QuizController {
 
@@ -32,8 +32,6 @@ public class QuizController {
         return ResponseEntity.ok(responses);
     }
 
-    //    @PreAuthorize("isAuthenticated() AND authentication.principal.id == #id OR hasAuthority
-    //    ('QUIZ_READ')")
     @GetMapping(value = "/{id}")
     ResponseEntity<?> getQuizById(@PathVariable("id") Long id) {
         QuizResponse response = quizMapper.entityToQuizResponse(quizService.findQuizById(id));

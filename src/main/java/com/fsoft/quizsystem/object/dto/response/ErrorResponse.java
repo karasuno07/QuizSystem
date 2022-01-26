@@ -18,7 +18,7 @@ public class ErrorResponse {
 
     private String message;
 
-    private Date timestamp = new Date();
+    private final Date timestamp = new Date();
 
     private Map<String, String> errors;
 }
