@@ -54,7 +54,7 @@ public class JwtService {
         payload.put("id", user.getId());
         payload.put("username", user.getUsername());
         if (!ObjectUtils.isEmpty(user.getRole())) {
-            payload.put("role", user.getRole().getName());
+            payload.put("role", user.getRole().getName().name());
         }
 
         JWTCreator.Builder builder = JWT.create();

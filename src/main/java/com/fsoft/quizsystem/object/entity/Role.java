@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "roles")
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Role {
+public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)

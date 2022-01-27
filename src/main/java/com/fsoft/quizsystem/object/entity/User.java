@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -22,7 +23,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class User implements UserDetails, OAuth2User {
+public class User implements Serializable, UserDetails, OAuth2User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)

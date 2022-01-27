@@ -1,5 +1,6 @@
 package com.fsoft.quizsystem.service;
 
+import com.fsoft.quizsystem.object.constant.SystemRole;
 import com.fsoft.quizsystem.object.dto.filter.UserFilter;
 import com.fsoft.quizsystem.object.dto.mapper.UserMapper;
 import com.fsoft.quizsystem.object.dto.request.UserRequest;
@@ -20,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.PostConstruct;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -31,6 +34,20 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     private final RoleService roleService;
+
+    @PostConstruct
+    private void init() {
+        if (!userRepository.existsByUsername("admin")) {
+            User user = new User();
+            user.setUsername("admin");
+            user.setPassword(passwordEncoder.encode("123456"));
+            user.setFullName("ADMIN USER");
+            user.setStatus(true);
+            user.setRole(roleService.findRoleByName(SystemRole.ADMIN));
+
+            userRepository.save(user);
+        }
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

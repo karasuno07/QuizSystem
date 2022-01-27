@@ -29,6 +29,7 @@ public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -40,4 +40,9 @@ public class RoleService {
         return roleRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Not found any role with id " + id));
     }
+
+    public Role findRoleByName(SystemRole name) {
+        return roleRepository.findByName(name).orElseThrow(
+                () -> new ResourceNotFoundException("Not found any role with name " + name));
+    }
 }
