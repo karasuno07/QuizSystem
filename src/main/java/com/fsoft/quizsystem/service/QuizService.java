@@ -8,6 +8,8 @@ import com.fsoft.quizsystem.object.entity.Category;
 import com.fsoft.quizsystem.object.entity.Quiz;
 import com.fsoft.quizsystem.object.entity.User;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
+import com.fsoft.quizsystem.object.exception.UnauthorizedException;
+import com.fsoft.quizsystem.object.validation.RoleValidator;
 import com.fsoft.quizsystem.repository.*;
 import com.fsoft.quizsystem.repository.spec.QuizSpecification;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +57,10 @@ public class QuizService {
         quizMapper.updateEntity(quiz, requestBody);
 
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        quiz.setInstructor(currentUser);
+        if (!RoleValidator.isAdmin(currentUser)) {
+            boolean hasAuthorization = currentUser.getId().equals(quiz.getInstructor().getId());
+            if (!hasAuthorization) throw new UnauthorizedException();
+        }
 
         Category category = categoryService.findCategoryById(requestBody.getCategoryId());
         quiz.setCategory(category);
@@ -66,11 +71,24 @@ public class QuizService {
     public void deleteQuiz(long id) {
         Quiz quiz = this.findQuizById(id);
 
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!RoleValidator.isAdmin(currentUser)) {
+            boolean hasAuthorization = currentUser.getId().equals(quiz.getInstructor().getId());
+            if (!hasAuthorization) throw new UnauthorizedException();
+        }
+
         quizRepository.delete(quiz);
     }
 
     public void changeQuizStatus(long id, String status) {
         Quiz quiz = this.findQuizById(id);
+
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!RoleValidator.isAdmin(currentUser)) {
+            boolean hasAuthorization = currentUser.getId().equals(quiz.getInstructor().getId());
+            if (!hasAuthorization) throw new UnauthorizedException();
+        }
+
         quiz.setStatus(Enum.valueOf(QuizStatus.class, status));
 
         quizRepository.delete(quiz);

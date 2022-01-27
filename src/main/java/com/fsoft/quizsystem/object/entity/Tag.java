@@ -20,7 +20,7 @@ public class Tag {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(columnDefinition = "varchar(50)", nullable = false)
+    @Column(columnDefinition = "varchar(50)", nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "tag") @ToString.Exclude

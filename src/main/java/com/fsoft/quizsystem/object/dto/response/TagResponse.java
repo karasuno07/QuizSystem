@@ -2,12 +2,9 @@ package com.fsoft.quizsystem.object.dto.response;
 
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
-public class RoleResponse {
+public class TagResponse {
 
     private Long id;
     private String name;
-    private Set<String> authorities;
 }

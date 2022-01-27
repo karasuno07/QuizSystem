@@ -1,11 +1,10 @@
 package com.fsoft.quizsystem.object.entity;
 
-import com.fsoft.quizsystem.object.constant.SystemAuthorities;
+import com.fsoft.quizsystem.object.constant.SystemRole;
 import lombok.*;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "roles")
@@ -13,7 +12,6 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
 public class Role {
     @Id
@@ -21,11 +19,11 @@ public class Role {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(columnDefinition = "varchar(50)", nullable = false)
-    private String name;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SystemRole name;
 
-    @Column(columnDefinition = "text")
-    @Enumerated
-    @ElementCollection(targetClass = SystemAuthorities.class)
-    private Set<SystemAuthorities> authorities;
+    public Role(SystemRole name) {
+        this.name = name;
+    }
 }

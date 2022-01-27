@@ -1,8 +1,8 @@
 package com.fsoft.quizsystem.object.dto.mapper;
 
-import com.fsoft.quizsystem.object.dto.request.RoleRequest;
-import com.fsoft.quizsystem.object.dto.response.RoleResponse;
-import com.fsoft.quizsystem.object.entity.Role;
+import com.fsoft.quizsystem.object.dto.request.TagRequest;
+import com.fsoft.quizsystem.object.dto.response.TagResponse;
+import com.fsoft.quizsystem.object.entity.Tag;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -11,11 +11,11 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface RoleMapper {
+public interface TagMapper {
 
-    Role roleRequestToEntity(RoleRequest request);
+    Tag tagReqeustToEntity(TagRequest request);
 
-    void updateEntity(@MappingTarget Role role, RoleRequest request);
+    void updateEntity(@MappingTarget Tag tag, TagRequest request);
 
-    RoleResponse entityToRoleResponse(Role role);
+    TagResponse entityToTagResponse(Tag tag);
 }

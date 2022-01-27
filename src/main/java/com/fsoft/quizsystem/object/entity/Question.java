@@ -20,12 +20,13 @@ public class Question {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(columnDefinition = "varchar(255)", nullable = false)
     private String title;
 
     @OneToMany(mappedBy = "question") @ToString.Exclude
     private Set<Answer> answers;
 
-    private Boolean isMultiple;
+    private Boolean isMultiple = false;
 
     @ManyToOne @JoinColumn(name = "tag_id")
     private Tag tag;

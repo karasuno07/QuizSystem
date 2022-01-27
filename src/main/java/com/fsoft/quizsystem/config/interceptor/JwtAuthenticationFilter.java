@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -38,11 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 AuthenticationInfo user = tokenProvider.getAuthInfoFromToken(jwt);
 
-                Collection<? extends GrantedAuthority> authorities = !ObjectUtils.isEmpty(user.getRoleName())
-                                                                     ? user.getPermissions().stream()
-                                                                           .map(SimpleGrantedAuthority::new)
-                                                                           .collect(Collectors.toSet())
-                                                                     : null;
+                Collection<? extends GrantedAuthority> authorities =
+                        !ObjectUtils.isEmpty(user.getRoleName())
+                        ? Collections.singleton(new SimpleGrantedAuthority(user.getRoleName()))
+                        : null;
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(user, null, authorities);

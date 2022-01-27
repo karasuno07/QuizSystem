@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -62,13 +61,10 @@ public class User implements UserDetails, OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (ObjectUtils.isEmpty(role)) {
-            return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
-        }
-
-        return role.getAuthorities().stream()
-                   .map(authority -> new SimpleGrantedAuthority(authority.name()))
-                   .collect(Collectors.toSet());
+        return Collections.singleton(
+                ObjectUtils.isEmpty(role)
+                ? new SimpleGrantedAuthority("ROLE_USER")
+                : new SimpleGrantedAuthority("ROLE_" + role.getName().name()));
     }
 
     @Override

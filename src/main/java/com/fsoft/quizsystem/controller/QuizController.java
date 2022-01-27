@@ -39,7 +39,7 @@ public class QuizController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('QUIZ_CREATE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
     @PostMapping
     ResponseEntity<?> createQuiz(@ModelAttribute @Valid QuizRequest body) {
         QuizResponse response = quizMapper.entityToQuizResponse(quizService.createQuiz(body));
@@ -47,7 +47,7 @@ public class QuizController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('QUIZ_UPDATE')") // TODO: modify precision authority
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")// TODO: modify precision authority
     @PutMapping(value = "/{id}")
     ResponseEntity<?> updateQuiz(@PathVariable("id") Long id, @ModelAttribute @Valid QuizRequest body) {
         QuizResponse response = quizMapper.entityToQuizResponse(quizService.updateQuiz(id, body));
@@ -55,7 +55,7 @@ public class QuizController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('QUIZ_UPDATE')") // TODO: modify precision authority
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')") // TODO: modify precision authority
     @PatchMapping(value = "/{id}/{status}")
     ResponseEntity<?> changeQuizStatus(@PathVariable("id") Long id, @PathVariable("status") String status) {
         quizService.changeQuizStatus(id, status);

@@ -55,9 +55,6 @@ public class JwtService {
         payload.put("username", user.getUsername());
         if (!ObjectUtils.isEmpty(user.getRole())) {
             payload.put("role", user.getRole().getName());
-            if (!ObjectUtils.isEmpty(user.getRole().getAuthorities())) {
-                payload.put("permissions", user.getRole().getAuthorities());
-            }
         }
 
         JWTCreator.Builder builder = JWT.create();
@@ -80,7 +77,6 @@ public class JwtService {
         authInfo.setId(claims.get("id").asInt());
         authInfo.setUsername(claims.get("username").asString());
         authInfo.setRoleName(claims.get("role").asString());
-        authInfo.setPermissions(new HashSet<>(claims.get("permissions").asList(String.class)));
 
         return authInfo;
     }

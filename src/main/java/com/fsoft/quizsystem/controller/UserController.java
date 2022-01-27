@@ -22,7 +22,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    @PreAuthorize("hasAnyAuthority('USER_READ')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(consumes = "application/json")
     ResponseEntity<?> getAllUsers(@RequestBody Optional<UserFilter> filter) {
         Page<UserResponse> responses = userService.findAllUsers(filter.orElse(new UserFilter()))
@@ -68,7 +68,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('USER_UPDATE')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping(value = "/{id}/deactivate")
     ResponseEntity<?> deactivateUser(@PathVariable Long id) {
         userService.deactivateUser(id);
@@ -76,7 +76,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('USER_UPDATE')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping(value = "/{id}/activate")
     ResponseEntity<?> activateUser(@PathVariable Long id) {
         userService.activateUser(id);

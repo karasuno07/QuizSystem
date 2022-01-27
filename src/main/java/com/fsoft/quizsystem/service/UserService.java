@@ -3,6 +3,7 @@ package com.fsoft.quizsystem.service;
 import com.fsoft.quizsystem.object.dto.filter.UserFilter;
 import com.fsoft.quizsystem.object.dto.mapper.UserMapper;
 import com.fsoft.quizsystem.object.dto.request.UserRequest;
+import com.fsoft.quizsystem.object.entity.Role;
 import com.fsoft.quizsystem.object.entity.User;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
 import com.fsoft.quizsystem.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,9 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    private final RoleService roleService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -48,6 +52,11 @@ public class UserService implements UserDetailsService {
         User user = userMapper.userRequestToEntity(requestBody);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        if (!ObjectUtils.isEmpty(requestBody.getRoleId())) {
+            Role role = roleService.findRoleById(requestBody.getRoleId());
+            user.setRole(role);
+        }
+
         return userRepository.save(user);
     }
 
@@ -55,6 +64,11 @@ public class UserService implements UserDetailsService {
         User user = this.findUserById(id);
         userMapper.updateEntity(user, requestBody);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if (!ObjectUtils.isEmpty(requestBody.getRoleId())) {
+            Role role = roleService.findRoleById(requestBody.getRoleId());
+            user.setRole(role);
+        }
 
         return userRepository.save(user);
     }

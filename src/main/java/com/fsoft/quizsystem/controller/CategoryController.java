@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,23 +36,23 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('CATEGORY_CREATE')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    ResponseEntity<?> createCategory(@ModelAttribute CategoryRequest requestBody) {
+    ResponseEntity<?> createCategory(@ModelAttribute @Valid CategoryRequest requestBody) {
         CategoryResponse response =
                 categoryMapper.entityToCategoryResponse(categoryService.createCategory(requestBody));
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('CATEGORY_UPDATE')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    ResponseEntity<?> updateCategory(@PathVariable Long id, @ModelAttribute CategoryRequest requestBody) {
+    ResponseEntity<?> updateCategory(@PathVariable Long id, @ModelAttribute @Valid CategoryRequest requestBody) {
         CategoryResponse response =
                 categoryMapper.entityToCategoryResponse(categoryService.updateCategory(id, requestBody));
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('CATEGORY_UPDATE')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);

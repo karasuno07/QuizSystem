@@ -5,11 +5,10 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class AuthenticationRequest {
+public class AnswerRequest {
 
     @NotBlank(message = "blank")
-    private String username;
+    private String text;
 
-    @NotBlank(message = "blank")
-    private String password;
+    private Boolean isCorrect;
 }
