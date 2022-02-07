@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/questions")
 @RequiredArgsConstructor
-public class QuestionController {
+public class QuestionController implements SecuredBearerTokenController {
 
     private final QuestionService questionService;
     private final QuestionMapper questionMapper;

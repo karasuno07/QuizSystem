@@ -14,7 +14,7 @@ public interface QuizMapper {
 
     void updateEntity(@MappingTarget Quiz quiz, QuizRequest request);
 
-    @Mapping(target = "instructorName", source = "instructor.name")
+    @Mapping(target = "instructorName", source = "instructor.fullName")
     @Mapping(target = "categoryName", source = "category.name")
     QuizResponse entityToQuizResponse(Quiz quiz);
 }

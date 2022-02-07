@@ -1,7 +1,14 @@
 server:
   servlet:
     context-path: /
+  port: 8081
+springdoc:
+  api-docs:
+    path: /
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   redis:
     client-name: master
     password: fsoft123456789
@@ -21,3 +28,7 @@ token:
   jwt:
     secret-key: 3618bf61-a667-4139-ac23-4267323e6217
     expiration-time: 300000
+cloudinary:
+  cloud-name: fpt-software-quiz
+  api-key: 446252591291621
+  api-secret: w6AQxknBfDg_ykT_NKFlTOOxQsw

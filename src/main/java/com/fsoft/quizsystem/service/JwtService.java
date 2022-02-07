@@ -54,7 +54,7 @@ public class JwtService {
         payload.put("id", user.getId());
         payload.put("username", user.getUsername());
         if (!ObjectUtils.isEmpty(user.getRole())) {
-            payload.put("role", user.getRole().getName().name());
+            payload.put("role", "ROLE_" + user.getRole().getName().name());
         }
 
         JWTCreator.Builder builder = JWT.create();
@@ -113,6 +113,10 @@ public class JwtService {
         } else {
             throw new TokenExpiredException("Refresh token has been expired");
         }
+    }
+
+    public User getUserById(long id) {
+        return tokenMap.get(id);
     }
 
 }

@@ -6,28 +6,26 @@ import com.fsoft.quizsystem.object.dto.request.QuizRequest;
 import com.fsoft.quizsystem.object.dto.response.QuizResponse;
 import com.fsoft.quizsystem.service.QuizService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/quizzes")
 @RequiredArgsConstructor
-public class QuizController {
+public class QuizController implements SecuredBearerTokenController {
 
     private final QuizService quizService;
     private final QuizMapper quizMapper;
 
-    @GetMapping(consumes = "application/json")
+    @GetMapping
     ResponseEntity<?> getAllQuizzes(@RequestBody Optional<QuizFilter> filter) {
-        List<QuizResponse> responses = quizService.findAllQuizzes(filter.orElse(new QuizFilter())).stream()
-                                                  .map(quizMapper::entityToQuizResponse)
-                                                  .collect(Collectors.toList());
+        Page<QuizResponse> responses = quizService.findAllQuizzes(filter.orElse(new QuizFilter()))
+                                                  .map(quizMapper::entityToQuizResponse);
 
         return ResponseEntity.ok(responses);
     }
@@ -63,7 +61,7 @@ public class QuizController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasAuthority('QUIZ_DELETE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
     @DeleteMapping(value = "/{id}")
     ResponseEntity<?> deleteQuiz(@PathVariable("id") Long id) {
         quizService.deleteQuiz(id);

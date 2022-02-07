@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/tags")
 @RequiredArgsConstructor
-public class TagController {
+public class TagController implements SecuredBearerTokenController {
 
     private final TagService tagService;
     private final TagMapper tagMapper;

@@ -34,6 +34,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     private final RoleService roleService;
+    private final CloudinaryService cloudinaryService;
 
     @PostConstruct
     private void init() {
@@ -73,6 +74,10 @@ public class UserService implements UserDetailsService {
             Role role = roleService.findRoleById(requestBody.getRoleId());
             user.setRole(role);
         }
+        if (!ObjectUtils.isEmpty(requestBody.getImageFile())) {
+            String image = cloudinaryService.uploadImage(null, requestBody.getImageFile());
+            if (image != null) user.setImage(image);
+        }
 
         return userRepository.save(user);
     }
@@ -85,6 +90,10 @@ public class UserService implements UserDetailsService {
         if (!ObjectUtils.isEmpty(requestBody.getRoleId())) {
             Role role = roleService.findRoleById(requestBody.getRoleId());
             user.setRole(role);
+        }
+        if (!ObjectUtils.isEmpty(requestBody.getImageFile())) {
+            String image = cloudinaryService.uploadImage(user.getImage(), requestBody.getImageFile());
+            if (image != null) user.setImage(image);
         }
 
         return userRepository.save(user);

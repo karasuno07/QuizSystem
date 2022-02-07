@@ -8,6 +8,7 @@ import com.fsoft.quizsystem.object.entity.User;
 import com.fsoft.quizsystem.object.model.RefreshToken;
 import com.fsoft.quizsystem.service.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Log4j2
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -27,10 +29,9 @@ public class AuthenticationController {
     /* username: admin, password: 123456 */
     @PostMapping(value = "login")
     ResponseEntity<?> createAccessToken(@RequestBody AuthenticationRequest request) {
-        System.out.println(request);
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-
+   
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = (User) authentication.getPrincipal();

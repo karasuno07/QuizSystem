@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/difficulties")
 @RequiredArgsConstructor
-public class DifficultyController {
+public class DifficultyController implements SecuredBearerTokenController {
 
     private final DifficultyService difficultyService;
     private final DifficultyMapper difficultyMapper;

@@ -12,8 +12,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -38,9 +38,9 @@ public class RestfulExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException exception) {
+            BindException exception) {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult()
                  .getAllErrors()
@@ -88,6 +88,7 @@ public class RestfulExceptionHandler {
             response.setMessage("Unauthorized");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         } else {
+            log.error(SecurityContextHolder.getContext().getAuthentication());
             response.setResponseCode(HttpStatus.FORBIDDEN.value());
             response.setMessage(exception.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);

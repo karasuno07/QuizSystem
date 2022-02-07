@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+
+    private final CloudinaryService cloudinaryService;
 
     public List<Category> findAllCategories() {
         return categoryRepository.findAll();
@@ -37,12 +40,22 @@ public class CategoryService {
     public Category createCategory(CategoryRequest requestBody) {
         Category category = categoryMapper.categoryRequestToEntity(requestBody);
 
+        if (!ObjectUtils.isEmpty(requestBody.getImageFile())) {
+            String image = cloudinaryService.uploadImage(null, requestBody.getImageFile());
+            if (image != null) category.setImage(image);
+        }
+
         return categoryRepository.save(category);
     }
 
     public Category updateCategory(long id, CategoryRequest requestBody) {
         Category category = this.findCategoryById(id);
         categoryMapper.updateEntity(category, requestBody);
+
+        if (!ObjectUtils.isEmpty(requestBody.getImageFile())) {
+            String image = cloudinaryService.uploadImage(category.getImage(), requestBody.getImageFile());
+            if (image != null) category.setImage(image);
+        }
 
         return categoryRepository.save(category);
     }

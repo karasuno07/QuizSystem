@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements SecuredBearerTokenController {
 
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
@@ -36,7 +36,7 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     ResponseEntity<?> createCategory(@ModelAttribute @Valid CategoryRequest requestBody) {
         CategoryResponse response =
@@ -44,7 +44,7 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     ResponseEntity<?> updateCategory(@PathVariable Long id, @ModelAttribute @Valid CategoryRequest requestBody) {
         CategoryResponse response =
@@ -52,7 +52,7 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);

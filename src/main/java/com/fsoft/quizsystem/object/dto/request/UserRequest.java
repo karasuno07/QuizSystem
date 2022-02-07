@@ -5,6 +5,7 @@ import com.fsoft.quizsystem.object.validation.NotSupportedImageType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -21,6 +22,7 @@ public class UserRequest {
     private FullName fullName;
 
     @NotBlank(message = "blank")
+    @Email(message = "invalid email format")
     private String email;
 
     @NotBlank(message = "blank")
@@ -29,6 +31,5 @@ public class UserRequest {
     @NotSupportedImageType
     private MultipartFile imageFile;
 
-    @NotNull(message = "null")
     private Long roleId;
 }

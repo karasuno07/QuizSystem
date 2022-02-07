@@ -4,6 +4,7 @@ import com.fsoft.quizsystem.object.constant.QuizStatus;
 import com.fsoft.quizsystem.object.dto.filter.QuizFilter;
 import com.fsoft.quizsystem.object.dto.mapper.QuizMapper;
 import com.fsoft.quizsystem.object.dto.request.QuizRequest;
+import com.fsoft.quizsystem.object.dto.response.AuthenticationInfo;
 import com.fsoft.quizsystem.object.entity.Category;
 import com.fsoft.quizsystem.object.entity.Quiz;
 import com.fsoft.quizsystem.object.entity.User;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,8 @@ public class QuizService {
     private final QuizMapper quizMapper;
 
     private final CategoryService categoryService;
+    private final JwtService tokenService;
+    private final CloudinaryService cloudinaryService;
 
     public Page<Quiz> findAllQuizzes(QuizFilter filter) {
         Specification<Quiz> specification = QuizSpecification.getSpecification(filter);
@@ -43,11 +47,17 @@ public class QuizService {
     public Quiz createQuiz(QuizRequest requestBody) {
         Quiz quiz = quizMapper.quizRequestToEntity(requestBody);
 
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        quiz.setInstructor(currentUser);
+        AuthenticationInfo currentUser = (AuthenticationInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User instructor = tokenService.getUserById(currentUser.getId());
+        quiz.setInstructor(instructor);
 
         Category category = categoryService.findCategoryById(requestBody.getCategoryId());
         quiz.setCategory(category);
+
+        if (!ObjectUtils.isEmpty(requestBody.getImageFile())) {
+            String image = cloudinaryService.uploadImage(null, requestBody.getImageFile());
+            if (image != null) quiz.setImage(image);
+        }
 
         return quizRepository.save(quiz);
     }
@@ -56,14 +66,21 @@ public class QuizService {
         Quiz quiz = this.findQuizById(id);
         quizMapper.updateEntity(quiz, requestBody);
 
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!RoleValidator.isAdmin(currentUser)) {
-            boolean hasAuthorization = currentUser.getId().equals(quiz.getInstructor().getId());
+        AuthenticationInfo currentUser = (AuthenticationInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User instructor = tokenService.getUserById(currentUser.getId());
+        quiz.setInstructor(instructor);
+        if (!RoleValidator.isAdmin(instructor)) {
+            boolean hasAuthorization = instructor.getId().equals(quiz.getInstructor().getId());
             if (!hasAuthorization) throw new UnauthorizedException();
         }
 
         Category category = categoryService.findCategoryById(requestBody.getCategoryId());
         quiz.setCategory(category);
+
+        if (!ObjectUtils.isEmpty(requestBody.getImageFile())) {
+            String image = cloudinaryService.uploadImage(quiz.getImage(), requestBody.getImageFile());
+            if (image != null) quiz.setImage(image);
+        }
 
         return quizRepository.save(quiz);
     }
@@ -71,9 +88,10 @@ public class QuizService {
     public void deleteQuiz(long id) {
         Quiz quiz = this.findQuizById(id);
 
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!RoleValidator.isAdmin(currentUser)) {
-            boolean hasAuthorization = currentUser.getId().equals(quiz.getInstructor().getId());
+        AuthenticationInfo currentUser = (AuthenticationInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User instructor = tokenService.getUserById(currentUser.getId());
+        if (!RoleValidator.isAdmin(instructor)) {
+            boolean hasAuthorization = instructor.getId().equals(quiz.getInstructor().getId());
             if (!hasAuthorization) throw new UnauthorizedException();
         }
 

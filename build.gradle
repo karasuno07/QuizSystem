@@ -19,10 +19,16 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.cloudinary:cloudinary-http44:1.30.0'
+
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.5'
+    implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.5'
+    implementation 'org.springdoc:springdoc-openapi-security:1.6.5'
+
     implementation group: 'com.auth0', name: 'java-jwt', version: '3.18.2'
     implementation group: 'org.redisson', name: 'redisson-spring-boot-starter', version: '3.16.3'
 
-    implementation 'org.hibernate:hibernate-envers:5.6.4.Final'
+    implementation 'org.hibernate:hibernate-envers:5.6.5.Final'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
 

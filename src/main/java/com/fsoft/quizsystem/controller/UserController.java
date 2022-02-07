@@ -17,13 +17,13 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements SecuredBearerTokenController {
 
     private final UserService userService;
     private final UserMapper userMapper;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(consumes = "application/json")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping
     ResponseEntity<?> getAllUsers(@RequestBody Optional<UserFilter> filter) {
         Page<UserResponse> responses = userService.findAllUsers(filter.orElse(new UserFilter()))
                                                   .map(userMapper::entityToUserResponse);
