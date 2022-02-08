@@ -1,5 +1,6 @@
 package com.fsoft.quizsystem.service;
 
+import com.fsoft.quizsystem.object.dto.filter.QuestionFilter;
 import com.fsoft.quizsystem.object.dto.mapper.AnswerMapper;
 import com.fsoft.quizsystem.object.dto.mapper.QuestionMapper;
 import com.fsoft.quizsystem.object.dto.request.QuestionRequest;
@@ -8,8 +9,11 @@ import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
 import com.fsoft.quizsystem.object.exception.UnauthorizedException;
 import com.fsoft.quizsystem.object.validation.RoleValidator;
 import com.fsoft.quizsystem.repository.QuestionRepository;
+import com.fsoft.quizsystem.repository.spec.QuestionSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +35,9 @@ public class QuestionService {
     private final DifficultyService difficultyService;
     private final AnswerService answerService;
 
-    public List<Question> findAllQuestionsByQuizId(long quizId) {
-        return questionRepository.findAllByQuizId(quizId);
+    public Page<Question> findAllQuestionsByQuizId(long quizId, QuestionFilter filter) {
+        Specification<Question> specification = QuestionSpecification.getSpecification(filter);
+        return questionRepository.findAllByQuizId(quizId, specification, filter.getPagination().getPageAndSort());
     }
 
     public Question findQuestionById(long id) {
