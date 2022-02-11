@@ -23,8 +23,8 @@ public class UserController implements SecuredBearerTokenController {
     private final UserMapper userMapper;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping
-    ResponseEntity<?> getAllUsers(@RequestBody Optional<UserFilter> filter) {
+    @PostMapping(value = "/all")
+    ResponseEntity<?> getAllUsersWithFilter(@RequestBody Optional<UserFilter> filter) {
         Page<UserResponse> responses = userService.findAllUsers(filter.orElse(new UserFilter()))
                                                   .map(userMapper::entityToUserResponse);
 

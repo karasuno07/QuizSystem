@@ -7,9 +7,17 @@ import org.springframework.util.ObjectUtils;
 
 public final class QuestionSpecification {
 
-    public static Specification<Question> getSpecification(QuestionFilter filter) {
-        return Specification.where(hasTagId(filter.getTagId()))
+    public static Specification<Question> getSpecification(Long quizId, QuestionFilter filter) {
+        return Specification.where(hasQuizId(quizId))
+                            .and(hasTagId(filter.getTagId()))
                             .and(hasDifficultyId(filter.getDifficultyId()));
+    }
+
+    private static Specification<Question> hasQuizId(Long quizId) {
+        return (root, query, builder) ->
+                ObjectUtils.isEmpty(quizId)
+                ? builder.conjunction()
+                : builder.equal(root.get("quiz").get("id"), quizId);
     }
 
     private static Specification<Question> hasTagId(Long tagId) {

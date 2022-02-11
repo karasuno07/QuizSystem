@@ -36,8 +36,8 @@ public class QuestionService {
     private final AnswerService answerService;
 
     public Page<Question> findAllQuestionsByQuizId(long quizId, QuestionFilter filter) {
-        Specification<Question> specification = QuestionSpecification.getSpecification(filter);
-        return questionRepository.findAllByQuizId(quizId, specification, filter.getPagination().getPageAndSort());
+        Specification<Question> specification = QuestionSpecification.getSpecification(quizId, filter);
+        return questionRepository.findAll(specification, filter.getPagination().getPageAndSort());
     }
 
     public Question findQuestionById(long id) {
@@ -49,6 +49,11 @@ public class QuestionService {
         Question question = questionMapper.questionRequestToEntity(requestBody);
         updateRelationProperties(question, requestBody);
 
+        Set<Answer> answers = requestBody.getAnswers().stream()
+                                          .map(answerMapper::answerRequestToEntity)
+                                          .collect(Collectors.toSet());
+        question.setAnswers(answers);
+
         return questionRepository.save(question);
     }
 
@@ -56,6 +61,11 @@ public class QuestionService {
         Question question = this.findQuestionById(id);
         questionMapper.updateEntity(question, requestBody);
         updateRelationProperties(question, requestBody);
+
+        Set<Answer> answers = requestBody.getAnswers().stream()
+                                         .map(answerMapper::answerRequestToEntity)
+                                         .collect(Collectors.toSet());
+        question.setAnswers(answers);
 
         return questionRepository.save(question);
     }

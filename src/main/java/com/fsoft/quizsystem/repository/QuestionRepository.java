@@ -9,6 +9,4 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>,
         JpaSpecificationExecutor<Question> {
-
-    Page<Question> findAllByQuizId(long quizId, Specification<Question> specification, Pageable pageable);
 }

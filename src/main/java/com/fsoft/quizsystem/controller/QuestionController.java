@@ -22,8 +22,8 @@ public class QuestionController implements SecuredBearerTokenController {
     private final QuestionService questionService;
     private final QuestionMapper questionMapper;
 
-    @GetMapping(value = "/{quizId}")
-    ResponseEntity<?> getQuestionsByQuizId(@PathVariable Long quizId,
+    @PostMapping(value = "/{quizId}/all")
+    ResponseEntity<?> getQuestionsByQuizIdWithFilter(@PathVariable Long quizId,
                                            @RequestBody Optional<QuestionFilter> filter) {
         Page<QuestionResponse> responses =
                 questionService.findAllQuestionsByQuizId(quizId, filter.orElse(new QuestionFilter()))

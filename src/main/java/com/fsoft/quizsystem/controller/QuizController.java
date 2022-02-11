@@ -22,8 +22,8 @@ public class QuizController implements SecuredBearerTokenController {
     private final QuizService quizService;
     private final QuizMapper quizMapper;
 
-    @GetMapping
-    ResponseEntity<?> getAllQuizzes(@RequestBody Optional<QuizFilter> filter) {
+    @PostMapping(value = "/all")
+    ResponseEntity<?> getAllQuizzesWithFilter(@RequestBody Optional<QuizFilter> filter) {
         Page<QuizResponse> responses = quizService.findAllQuizzes(filter.orElse(new QuizFilter()))
                                                   .map(quizMapper::entityToQuizResponse);
 
