@@ -3,10 +3,8 @@ package com.fsoft.quizsystem.object.dto.mapper;
 import com.fsoft.quizsystem.object.dto.request.CategoryRequest;
 import com.fsoft.quizsystem.object.dto.response.CategoryResponse;
 import com.fsoft.quizsystem.object.entity.Category;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import com.fsoft.quizsystem.util.StringUtils;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -18,4 +16,10 @@ public interface CategoryMapper {
     void updateEntity(@MappingTarget Category category, CategoryRequest request);
 
     CategoryResponse entityToCategoryResponse(Category category);
+
+    @AfterMapping
+    default void getSlug(@MappingTarget Category category, CategoryRequest request) {
+        String slug = StringUtils.generateSlug(request.getName());
+        category.setSlug(slug);
+    }
 }

@@ -18,12 +18,21 @@ public class Category {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(columnDefinition = "varchar(50)", nullable = false)
+    @Column(columnDefinition = "varchar(50)", nullable = false, unique = true)
     private String name;
+
+    @Column(columnDefinition = "varchar(50)", nullable = false)
+    private String slug;
 
     @Column(columnDefinition = "text")
     private String image;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL) @ToString.Exclude
     private Set<Quiz> quizzes;
+
+    public Category(String name, String slug, String image) {
+        this.name = name;
+        this.slug = slug;
+        this.image = image;
+    }
 }
