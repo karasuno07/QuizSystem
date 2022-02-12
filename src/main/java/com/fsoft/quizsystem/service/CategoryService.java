@@ -7,6 +7,7 @@ import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
 import com.fsoft.quizsystem.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,11 @@ public class CategoryService {
     public Category findCategoryById(long id) {
         return categoryRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Not found any category with id " + id));
+    }
+
+    public Category findCategoryByName(String name) {
+        return categoryRepository.findByName(name).orElseThrow(
+                () -> new ResourceNotFoundException("Not found any category with name " + name));
     }
 
     public Category createCategory(CategoryRequest requestBody) {

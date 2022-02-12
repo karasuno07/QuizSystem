@@ -3,9 +3,11 @@ package com.fsoft.quizsystem.object.entity;
 import com.fsoft.quizsystem.object.constant.QuizStatus;
 import lombok.*;
 import org.hibernate.envers.Audited;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "quizzes")
@@ -37,7 +39,7 @@ public class Quiz {
     private Category category;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL) @ToString.Exclude
-    private List<Question> questions;
+    private Set<Question> questions;
 
     @ManyToOne @JoinColumn(name = "instructor_id")
     private User instructor;
@@ -45,5 +47,11 @@ public class Quiz {
     @PostPersist
     public void postPersist() {
         status = QuizStatus.DRAFT;
+    }
+
+    public void addQuestion(Question question) {
+        if (ObjectUtils.isEmpty(questions)) questions = new HashSet<>();
+        questions.add(question);
+        question.setQuiz(this);
     }
 }

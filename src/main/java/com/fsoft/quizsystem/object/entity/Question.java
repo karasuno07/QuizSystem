@@ -2,8 +2,10 @@ package com.fsoft.quizsystem.object.entity;
 
 import lombok.*;
 import org.hibernate.envers.Audited;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -35,4 +37,10 @@ public class Question {
     private Difficulty difficulty;
 
     @ManyToOne @JoinColumn(name = "quiz_id") private Quiz quiz;
+
+    public void addAnswer(Answer answer) {
+        if (ObjectUtils.isEmpty(answers)) answers = new HashSet<>();
+        answers.add(answer);
+        answer.setQuestion(this);
+    }
 }

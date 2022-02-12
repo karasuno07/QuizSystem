@@ -27,4 +27,9 @@ public class Answer {
     @ManyToOne
     @JoinColumn(name = "question_id")
     private Question question;
+
+    public Answer(String text, Boolean isCorrect) {
+        this.text = text;
+        this.isCorrect = isCorrect;
+    }
 }

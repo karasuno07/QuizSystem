@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import javax.annotation.PostConstruct;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,7 +33,6 @@ public class QuestionService {
     private final QuizService quizService;
     private final TagService tagService;
     private final DifficultyService difficultyService;
-    private final AnswerService answerService;
 
     public Page<Question> findAllQuestionsByQuizId(long quizId, QuestionFilter filter) {
         Specification<Question> specification = QuestionSpecification.getSpecification(quizId, filter);
@@ -50,8 +49,8 @@ public class QuestionService {
         updateRelationProperties(question, requestBody);
 
         Set<Answer> answers = requestBody.getAnswers().stream()
-                                          .map(answerMapper::answerRequestToEntity)
-                                          .collect(Collectors.toSet());
+                                         .map(answerMapper::answerRequestToEntity)
+                                         .collect(Collectors.toSet());
         question.setAnswers(answers);
 
         return questionRepository.save(question);
