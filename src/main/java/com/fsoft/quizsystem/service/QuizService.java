@@ -10,11 +10,12 @@ import com.fsoft.quizsystem.object.entity.*;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
 import com.fsoft.quizsystem.object.exception.UnauthorizedException;
 import com.fsoft.quizsystem.object.validation.RoleValidator;
+import com.fsoft.quizsystem.repository.QuestionRepository;
 import com.fsoft.quizsystem.repository.QuizRepository;
 import com.fsoft.quizsystem.repository.spec.QuizSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,6 +69,7 @@ public class QuizService {
             );
             answersForQuestion1.forEach(question1::addAnswer);
 
+
             Question question2 = new Question();
             question2.setTag(htmlCssTag);
             question2.setDifficulty(difficultyService.findDifficultyByLevel(DifficultyLevel.EASY));
@@ -78,7 +80,7 @@ public class QuizService {
                     new Answer("text-color", false),
                     new Answer("fg-color", false)
             );
-            answersForQuestion2.forEach(question1::addAnswer);
+            answersForQuestion2.forEach(question2::addAnswer);
 
             List<Question> initialQuestions = Arrays.asList(question1, question2);
             initialQuestions.forEach(initialQuiz::addQuestion);
