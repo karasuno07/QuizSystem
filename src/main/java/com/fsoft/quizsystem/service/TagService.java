@@ -22,22 +22,6 @@ public class TagService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
 
-    @PostConstruct
-    private void init() {
-        if (tagRepository.count() == 0) {
-            List<Tag> initialTags = Arrays.asList(
-                new Tag("HTML5/CSS3"),
-                new Tag("Javascript"),
-                new Tag("Java"),
-                new Tag("Python"),
-                new Tag("DevOps"),
-                new Tag("Kernel/OS")
-            );
-
-            tagRepository.saveAll(initialTags);
-        }
-    }
-
     public List<Tag> findAllTags() {
         return tagRepository.findAll();
     }

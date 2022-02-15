@@ -14,6 +14,10 @@ services:
       - database.env
     volumes:
       - db-data:/var/lib/postgresql/data
+      # copy the sql script to create tables
+      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      # copy the sql script to fill tables
+      - ./sql/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
   adminer:
     image: adminer
     restart: always
@@ -24,7 +28,7 @@ services:
     restart: always
     command: redis-server --requirepass fpt@123456
     ports:
-      - "6379:6379"
+      - "5002:6379"
     environment:
       - REDIS_RELICATION_MODE=master
     volumes:

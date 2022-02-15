@@ -1,6 +1,9 @@
 package com.fsoft.quizsystem.config;
 
 import com.fsoft.quizsystem.config.interceptor.JwtAuthenticationFilter;
+import com.fsoft.quizsystem.config.handler.OAuth2LoginFailureHandler;
+import com.fsoft.quizsystem.config.handler.OAuth2LoginSuccessHandler;
+import com.fsoft.quizsystem.service.CustomOAuth2UserService;
 import com.fsoft.quizsystem.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,11 +26,20 @@ public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomOAuth2UserService oauth2UserService;
+    private final OAuth2LoginSuccessHandler oauthLoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
     public BasicSecurityConfig(@Lazy UserService userDetailsService,
-                               JwtAuthenticationFilter jwtAuthenticationFilter) {
+                               JwtAuthenticationFilter jwtAuthenticationFilter,
+                               @Lazy CustomOAuth2UserService oauth2UserService,
+                               @Lazy OAuth2LoginSuccessHandler oauthLoginSuccessHandler,
+                               @Lazy OAuth2LoginFailureHandler oAuth2LoginFailureHandler) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.oauth2UserService = oauth2UserService;
+        this.oauthLoginSuccessHandler = oauthLoginSuccessHandler;
+        this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
     }
 
 
@@ -62,6 +74,14 @@ public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
+                .oauth2Login()
+                .loginPage("/login")
+                .userInfoEndpoint()
+                .userService(oauth2UserService)
+                .and()
+                .successHandler(oauthLoginSuccessHandler)
+                .failureHandler(oAuth2LoginFailureHandler)
+                .and()
                 .authorizeRequests().anyRequest().permitAll();
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

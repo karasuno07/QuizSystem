@@ -22,20 +22,6 @@ public class DifficultyService {
 
     private final DifficultyRepository difficultyRepository;
 
-    @PostConstruct
-    private void init() {
-        if (difficultyRepository.count() == 0) {
-            List<Difficulty> difficultyList =
-                    new ArrayList<>(Arrays.asList(new Difficulty(DifficultyLevel.EASY,
-                                                                 DifficultyPoint.EASY),
-                                                  new Difficulty(DifficultyLevel.MEDIUM,
-                                                                 DifficultyPoint.MEDIUM),
-                                                  new Difficulty(DifficultyLevel.HARD,
-                                                                 DifficultyPoint.HARD)));
-            difficultyRepository.saveAll(difficultyList);
-        }
-    }
-
     public List<Difficulty> findAllDifficulties() {
         return difficultyRepository.findAll();
     }

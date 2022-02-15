@@ -37,16 +37,14 @@ public class JwtService {
     private Long expirationTime;
 
     private final RedissonClient redissonClient;
-    private final UserMapper userMapper;
-
-    private RMapCache<String, Long> userIdMap;
-    private RMapCache<Long, User> tokenMap;
     private final TimeUnit timeUnit = TimeUnit.HOURS;
+    private RMapCache<String, Long> tokenMap;
+    private RMapCache<Long, User> userMap;
 
     @PostConstruct
     public void init() {
-        userIdMap = redissonClient.getMapCache("USER_ID_MAP");
         tokenMap = redissonClient.getMapCache("REFRESH_TOKEN_MAP");
+        userMap = redissonClient.getMapCache("USER_MAP");
     }
 
     public String generateAccessToken(@NonNull User user) {
@@ -98,16 +96,16 @@ public class JwtService {
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setUser(user);
 
-        userIdMap.fastPut(refreshToken.getToken(), user.getId(), 6, timeUnit);
-        tokenMap.fastPut(user.getId(), user, 6, timeUnit);
+        tokenMap.fastPut(refreshToken.getToken(), user.getId(), 6, timeUnit);
+        userMap.fastPut(user.getId(), user, 6, timeUnit);
 
         return refreshToken;
     }
 
     public RefreshToken verifyExpiration(String token) {
-        if (userIdMap.remainTimeToLive(token) > 0) {
-            Long userId = userIdMap.get(token);
-            User user = tokenMap.get(userId);
+        if (tokenMap.remainTimeToLive(token) > 0) {
+            Long userId = tokenMap.get(token);
+            User user = userMap.get(userId);
 
             return generateRefreshToken(user);
         } else {
@@ -116,7 +114,7 @@ public class JwtService {
     }
 
     public User getUserById(long id) {
-        return tokenMap.get(id);
+        return userMap.get(id);
     }
 
 }

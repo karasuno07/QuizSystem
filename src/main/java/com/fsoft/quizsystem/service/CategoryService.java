@@ -1,15 +1,18 @@
 package com.fsoft.quizsystem.service;
 
+import com.fsoft.quizsystem.object.dto.filter.CategoryFilter;
 import com.fsoft.quizsystem.object.dto.mapper.CategoryMapper;
 import com.fsoft.quizsystem.object.dto.request.CategoryRequest;
 import com.fsoft.quizsystem.object.entity.Category;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
 import com.fsoft.quizsystem.repository.CategoryRepository;
+import com.fsoft.quizsystem.repository.spec.CategorySpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -27,29 +30,9 @@ public class CategoryService {
 
     private final CloudinaryService cloudinaryService;
 
-    @PostConstruct
-    private void init() {
-        if (categoryRepository.count() == 0) {
-            List<Category> initialCategories = Arrays.asList(
-                    new Category("Development", "development", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/developement_zah93x.jpg"),
-                    new Category("Business", "business", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/business_niyc4b.jpg"),
-                    new Category("Design", "design", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/design_k3sin6.jpg"),
-                    new Category("IT and Software", "it-and-software", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/it-and-software_zguif9.jpg"),
-                    new Category("Marketing", "marketing", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/marketing_bliev0.jpg"),
-                    new Category("Music", "music", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/music_t4mncd.jpg"),
-                    new Category("Personal Development", "personal-development", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/personal-developement_npjujq.jpg"),
-                    new Category("Photography", "photography", "https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/photography_kdazmf.jpg")
-            );
-            categoryRepository.saveAll(initialCategories);
-        }
-    }
-
-    public List<Category> findAllCategories() {
-        return categoryRepository.findAll();
-    }
-
-    public Page<Category> findAllCategories(Pageable pageable) {
-        return categoryRepository.findAll(pageable);
+    public Page<Category> findAllCategories(CategoryFilter filter) {
+        Specification<Category> specification = CategorySpecification.getSpecification(filter);
+        return categoryRepository.findAll(specification, filter.getPagination().getPageAndSort());
     }
 
     public Category findCategoryById(long id) {

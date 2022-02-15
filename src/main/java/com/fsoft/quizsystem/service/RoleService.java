@@ -21,18 +21,6 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    @PostConstruct
-    private void init() {
-        if (roleRepository.count() == 0) {
-            List<Role> systemRoles = new ArrayList<>(Arrays.asList(
-                    new Role(SystemRole.ADMIN),
-                    new Role(SystemRole.INSTRUCTOR)
-            ));
-
-            roleRepository.saveAll(systemRoles);
-        }
-    }
-
     public List<Role> findAllRoles() {
         return roleRepository.findAll();
     }

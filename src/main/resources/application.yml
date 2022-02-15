@@ -12,7 +12,7 @@ spring:
   redis:
     client-name: master
     password: fpt@123456
-    url: redis://localhost:6379
+    url: redis://localhost:5002
   data:
     rest:
       base-path: /api
@@ -23,7 +23,18 @@ spring:
     username: postgres
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+  security:
+    oauth2:
+      client:
+        redirectUrl: http://localhost:8080/quizsystem_war/auth/oauth2
+        registration:
+          google:
+            clientId: 1011455872750-lnsck8sej8rbj7o39bohbotek1mpb7dp.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+              - profile
 token:
   jwt:
     secret-key: 3618bf61-a667-4139-ac23-4267323e6217

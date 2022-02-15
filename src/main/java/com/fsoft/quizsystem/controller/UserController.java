@@ -28,11 +28,10 @@ public class UserController implements SecuredBearerTokenController {
     ResponseEntity<?> getAllUsersWithFilter(@RequestBody Optional<UserFilter> filter) {
         Page<UserResponse> responses = userService.findAllUsers(filter.orElse(new UserFilter()))
                                                   .map(userMapper::entityToUserResponse);
-
         return ResponseEntity.ok(responses);
     }
 
-    @PreAuthorize("isAuthenticated() AND authentication.principal.id == #id OR hasAnyAuthority('USER_READ')")
+    @PreAuthorize("isAuthenticated() AND authentication.principal.id == #id OR hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}")
     ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
         UserResponse response = userMapper.entityToUserResponse(userService.findUserById(id));
@@ -69,7 +68,7 @@ public class UserController implements SecuredBearerTokenController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}/deactivate")
     ResponseEntity<?> deactivateUser(@PathVariable Long id) {
         userService.deactivateUser(id);
@@ -77,7 +76,7 @@ public class UserController implements SecuredBearerTokenController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}/activate")
     ResponseEntity<?> activateUser(@PathVariable Long id) {
         userService.activateUser(id);

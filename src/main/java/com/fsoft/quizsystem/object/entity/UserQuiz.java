@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "users_quizs")
+@Table(name = "users_quizzes")
 @Audited
 @Getter
 @Setter

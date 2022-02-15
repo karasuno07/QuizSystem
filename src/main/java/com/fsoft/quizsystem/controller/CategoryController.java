@@ -1,16 +1,19 @@
 package com.fsoft.quizsystem.controller;
 
+import com.fsoft.quizsystem.object.dto.filter.CategoryFilter;
 import com.fsoft.quizsystem.object.dto.mapper.CategoryMapper;
 import com.fsoft.quizsystem.object.dto.request.CategoryRequest;
 import com.fsoft.quizsystem.object.dto.response.CategoryResponse;
 import com.fsoft.quizsystem.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin("*")
@@ -22,11 +25,10 @@ public class CategoryController implements SecuredBearerTokenController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
 
-    @GetMapping
-    ResponseEntity<?> getAllCategories() {
-        List<CategoryResponse> responses = categoryService.findAllCategories().stream()
-                                                          .map(categoryMapper::entityToCategoryResponse)
-                                                          .collect(Collectors.toList());
+    @PostMapping("/all")
+    ResponseEntity<?> getAllCategories(@RequestBody Optional<CategoryFilter> filter) {
+        Page<CategoryResponse> responses = categoryService.findAllCategories(filter.orElse(new CategoryFilter()))
+                                                          .map(categoryMapper::entityToCategoryResponse);
         return ResponseEntity.ok(responses);
     }
 

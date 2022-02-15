@@ -15,8 +15,8 @@ import java.io.Serializable;
 @ToString
 public class UserQuizId implements Serializable {
 
-    private int userId;
+    private long userId;
 
-    private int quizId;
+    private long quizId;
 
 }

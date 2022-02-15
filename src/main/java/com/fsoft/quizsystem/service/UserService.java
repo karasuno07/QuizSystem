@@ -7,17 +7,18 @@ import com.fsoft.quizsystem.object.dto.request.UserRequest;
 import com.fsoft.quizsystem.object.entity.Role;
 import com.fsoft.quizsystem.object.entity.User;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
+import com.fsoft.quizsystem.object.oauth2.OAuth2UserInfo;
 import com.fsoft.quizsystem.repository.UserRepository;
 import com.fsoft.quizsystem.repository.spec.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -37,37 +38,6 @@ public class UserService implements UserDetailsService {
 
     private final RoleService roleService;
     private final CloudinaryService cloudinaryService;
-
-    @PostConstruct
-    private void init() {
-        if (userRepository.count() == 0) {
-            User admin = new User();
-            admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("123456"));
-            admin.setFullName("ADMIN USER");
-            admin.setStatus(true);
-            admin.setRole(roleService.findRoleByName(SystemRole.ADMIN));
-
-            User instructor1 = new User();
-            instructor1.setUsername("instructor1");
-            instructor1.setPassword(passwordEncoder.encode("123456"));
-            instructor1.setFullName("John Doe");
-            instructor1.setEmail("johndoe@gmail.com");
-            instructor1.setPhoneNumber("1234567890");
-            instructor1.setStatus(true);
-            instructor1.setRole(roleService.findRoleByName(SystemRole.INSTRUCTOR));
-
-            User guest1 = new User();
-            guest1.setUsername("guest1");
-            guest1.setPassword(passwordEncoder.encode("123456"));
-            guest1.setFullName("Mary Smith");
-            guest1.setEmail("mary.smith@gmail.com");
-            guest1.setPhoneNumber("0987654321");
-            guest1.setStatus(true);
-
-            userRepository.saveAll(Arrays.asList(admin, instructor1, guest1));
-        }
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -89,6 +59,11 @@ public class UserService implements UserDetailsService {
                 () -> new BadCredentialsException("User " + username + " not found"));
     }
 
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new BadCredentialsException("User " + email + " not found"));
+    }
+
     public User createUser(UserRequest requestBody) {
         User user = userMapper.userRequestToEntity(requestBody);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -104,6 +79,21 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(user);
     }
+
+    public User createUser(OAuth2UserInfo oAuth2UserInfo) {
+        User user = new User();
+
+        user.setFullName(oAuth2UserInfo.getFirstName() + " " + oAuth2UserInfo.getLastName());
+        user.setEmail(oAuth2UserInfo.getEmail());
+        user.setImage(oAuth2UserInfo.getImageUrl());
+        user.setUsername(oAuth2UserInfo.getUsername());
+        user.setActive(true);
+//        user.setRole(roleService.findRoleByName(SystemRole.INSTRUCTOR));
+        user.setPassword(new BCryptPasswordEncoder().encode("123456"));
+
+        return userRepository.save(user);
+    }
+
 
     public User updateUser(long id, UserRequest requestBody) {
         User user = this.findUserById(id);
@@ -130,13 +120,13 @@ public class UserService implements UserDetailsService {
 
     public void deactivateUser(long id) {
         User user = this.findUserById(id);
-        user.setStatus(false);
+        user.setActive(false);
         userRepository.save(user);
     }
 
     public void activateUser(long id) {
         User user = this.findUserById(id);
-        user.setStatus(true);
+        user.setActive(true);
         userRepository.save(user);
     }
 

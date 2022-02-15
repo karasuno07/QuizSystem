@@ -1,18 +1,19 @@
 package com.fsoft.quizsystem.object.entity;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.hibernate.envers.Audited;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -23,7 +24,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class User implements Serializable, UserDetails, OAuth2User {
+@SQLDelete(sql = "UPDATE users SET active = false WHERE id = ?")
+@Where(clause = "active=true")
+public class User implements Serializable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
@@ -35,10 +38,10 @@ public class User implements Serializable, UserDetails, OAuth2User {
     @Column(columnDefinition = "varchar(80)", nullable = false)
     private String password;
 
-    @Column(columnDefinition = "varchar(50)", nullable = false)
+    @Column(columnDefinition = "varchar(100)", nullable = false)
     private String fullName;
 
-    @Column(columnDefinition = "varchar(100)", unique = true)
+    @Column(columnDefinition = "varchar(255)", unique = true, nullable = false)
     private String email;
 
     @Column(columnDefinition = "varchar(12)")
@@ -53,12 +56,7 @@ public class User implements Serializable, UserDetails, OAuth2User {
     @OneToMany(mappedBy = "instructor") @ToString.Exclude
     private Set<Quiz> quizSet;
 
-    private Boolean status = true;
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return null;
-    }
+    private Boolean active = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -70,26 +68,21 @@ public class User implements Serializable, UserDetails, OAuth2User {
 
     @Override
     public boolean isAccountNonExpired() {
-        return status;
+        return active;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return status;
+        return active;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return status;
+        return active;
     }
 
     @Override
     public boolean isEnabled() {
-        return status;
-    }
-
-    @Override
-    public String getName() {
-        return null;
+        return active;
     }
 }
