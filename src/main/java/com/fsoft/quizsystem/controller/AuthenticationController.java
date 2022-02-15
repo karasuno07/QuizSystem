@@ -41,7 +41,7 @@ public class AuthenticationController {
         RefreshToken refreshToken = tokenService.generateRefreshToken(user);
 
         TokenResponse response = new TokenResponse(accessToken, refreshToken.getToken(),
-                                                   userMapper.entityToUserResponse(user));;
+                                                   userMapper.entityToUserResponse(user));
 
         return ResponseEntity.ok(response);
     }

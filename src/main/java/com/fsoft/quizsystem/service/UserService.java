@@ -1,6 +1,5 @@
 package com.fsoft.quizsystem.service;
 
-import com.fsoft.quizsystem.object.constant.SystemRole;
 import com.fsoft.quizsystem.object.dto.filter.UserFilter;
 import com.fsoft.quizsystem.object.dto.mapper.UserMapper;
 import com.fsoft.quizsystem.object.dto.request.UserRequest;
