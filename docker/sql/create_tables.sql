@@ -99,20 +99,16 @@ alter table answers owner to postgres;
 -- create audit tables
 create table revinfo
 (
-    rev      integer not null
-        primary key,
+    rev      integer not null primary key,
     revtstmp bigint
 );
 
-alter table revinfo
-    owner to postgres;
+alter table revinfo owner to postgres;
 
 create table answers_aud
 (
     id          bigint  not null,
-    rev         integer not null
-        constraint fkini8u1yepd95v0xbkyh8cljqq
-            references revinfo,
+    rev         integer not null constraint fkini8u1yepd95v0xbkyh8cljqq references revinfo,
     revtype     smallint,
     is_correct  boolean,
     text        text,
@@ -120,15 +116,12 @@ create table answers_aud
     primary key (id, rev)
 );
 
-alter table answers_aud
-    owner to postgres;
+alter table answers_aud owner to postgres;
 
 create table categories_aud
 (
     id      bigint  not null,
-    rev     integer not null
-        constraint fk6ti58h8w0q47oacscu06hcite
-            references revinfo,
+    rev     integer not null constraint fk6ti58h8w0q47oacscu06hcite references revinfo,
     revtype smallint,
     image   text,
     name    varchar(50),
@@ -136,30 +129,24 @@ create table categories_aud
     primary key (id, rev)
 );
 
-alter table categories_aud
-    owner to postgres;
+alter table categories_aud owner to postgres;
 
 create table difficulties_aud
 (
     id      bigint  not null,
-    rev     integer not null
-        constraint fk7b7mkqjtkhvk29lcem0vjfn24
-            references revinfo,
+    rev     integer not null constraint fk7b7mkqjtkhvk29lcem0vjfn24 references revinfo,
     revtype smallint,
     level   varchar(255),
     point   integer,
     primary key (id, rev)
 );
 
-alter table difficulties_aud
-    owner to postgres;
+alter table difficulties_aud owner to postgres;
 
 create table questions_aud
 (
     id            bigint  not null,
-    rev           integer not null
-        constraint fk17yard257f6u58jc6oxmbsofj
-            references revinfo,
+    rev           integer not null constraint fk17yard257f6u58jc6oxmbsofj references revinfo,
     revtype       smallint,
     is_multiple   boolean,
     title         varchar(255),
@@ -169,15 +156,12 @@ create table questions_aud
     primary key (id, rev)
 );
 
-alter table questions_aud
-    owner to postgres;
+alter table questions_aud owner to postgres;
 
 create table quizzes_aud
 (
     id            bigint  not null,
-    rev           integer not null
-        constraint fk2vgrsvfrjdxyr831iaum96m8v
-            references revinfo,
+    rev           integer not null constraint fk2vgrsvfrjdxyr831iaum96m8v references revinfo,
     revtype       smallint,
     description   text,
     image         text,
@@ -188,43 +172,34 @@ create table quizzes_aud
     primary key (id, rev)
 );
 
-alter table quizzes_aud
-    owner to postgres;
+alter table quizzes_aud owner to postgres;
 
 create table roles_aud
 (
     id      bigint  not null,
-    rev     integer not null
-        constraint fkt0mnl3rej2p0h9gxnbalf2kdd
-            references revinfo,
+    rev     integer not null constraint fkt0mnl3rej2p0h9gxnbalf2kdd references revinfo,
     revtype smallint,
     name    varchar(255),
     primary key (id, rev)
 );
 
-alter table roles_aud
-    owner to postgres;
+alter table roles_aud owner to postgres;
 
 create table tags_aud
 (
     id      bigint  not null,
-    rev     integer not null
-        constraint fk1jtbkw86fnuap1gio8ucmbj86
-            references revinfo,
+    rev     integer not null constraint fk1jtbkw86fnuap1gio8ucmbj86 references revinfo,
     revtype smallint,
     name    varchar(50),
     primary key (id, rev)
 );
 
-alter table tags_aud
-    owner to postgres;
+alter table tags_aud owner to postgres;
 
 create table users_aud
 (
     id           bigint  not null,
-    rev          integer not null
-        constraint fkc4vk4tui2la36415jpgm9leoq
-            references revinfo,
+    rev          integer not null constraint fkc4vk4tui2la36415jpgm9leoq references revinfo,
     revtype      smallint,
     active       boolean,
     email        varchar(255),
@@ -237,16 +212,13 @@ create table users_aud
     primary key (id, rev)
 );
 
-alter table users_aud
-    owner to postgres;
+alter table users_aud owner to postgres;
 
 create table users_quizzes_aud
 (
     quiz_id            bigint  not null,
     user_id            bigint  not null,
-    rev                integer not null
-        constraint fkq64p76159rrlinpx1b44cmwo6
-            references revinfo,
+    rev                integer not null constraint fkq64p76159rrlinpx1b44cmwo6 references revinfo,
     revtype            smallint,
     max_score          integer,
     recent_active_date timestamp,
@@ -254,6 +226,5 @@ create table users_quizzes_aud
     primary key (quiz_id, user_id, rev)
 );
 
-alter table users_quizzes_aud
-    owner to postgres;
+alter table users_quizzes_aud owner to postgres;
 

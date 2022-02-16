@@ -14,8 +14,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@SequenceGenerator(name = "categories_id_seq", sequenceName = "categories_id_seq", allocationSize = 1)
 public class Category {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) @Column(name = "id", nullable = false)
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "categories_id_seq")
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(columnDefinition = "varchar(50)", nullable = false, unique = true)

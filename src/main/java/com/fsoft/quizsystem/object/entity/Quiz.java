@@ -17,9 +17,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@SequenceGenerator(name = "quizzes_id_seq", sequenceName = "quizzes_id_seq", allocationSize = 1)
 public class Quiz {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quizzes_id_seq")
     @Column(name = "id", nullable = false)
     private Long id;
 

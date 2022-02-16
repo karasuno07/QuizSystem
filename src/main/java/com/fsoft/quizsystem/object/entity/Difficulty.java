@@ -15,9 +15,10 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @ToString
+@SequenceGenerator(name = "difficulties_id_seq", sequenceName = "difficulties_id_seq", allocationSize = 1)
 public class Difficulty {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "difficulties_id_seq")
     @Column(name = "id", nullable = false)
     private Long id;
 

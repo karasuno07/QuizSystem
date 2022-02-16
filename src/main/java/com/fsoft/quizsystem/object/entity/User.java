@@ -1,7 +1,6 @@
 package com.fsoft.quizsystem.object.entity;
 
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.hibernate.envers.Audited;
@@ -24,11 +23,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@SequenceGenerator(name = "users_id_seq", sequenceName = "users_id_seq", allocationSize = 1)
 @SQLDelete(sql = "UPDATE users SET active = false WHERE id = ?")
 @Where(clause = "active=true")
 public class User implements Serializable, UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_seq")
     @Column(name = "id", nullable = false)
     private Long id;
 

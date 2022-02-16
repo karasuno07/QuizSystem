@@ -13,9 +13,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@SequenceGenerator(name = "answers_id_seq", sequenceName = "answers_id_seq", allocationSize = 1)
 public class Answer {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "answers_id_seq")
     @Column(name = "id", nullable = false)
     private Long id;
 

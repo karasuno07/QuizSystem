@@ -14,9 +14,10 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @ToString
+@SequenceGenerator(name = "roles_id_seq", sequenceName = "roles_id_seq", allocationSize = 1)
 public class Role implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "roles_id_seq")
     @Column(name = "id", nullable = false)
     private Long id;
 
