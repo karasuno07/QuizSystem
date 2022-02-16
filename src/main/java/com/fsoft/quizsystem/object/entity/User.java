@@ -56,6 +56,16 @@ public class User implements Serializable, UserDetails {
     @OneToMany(mappedBy = "instructor") @ToString.Exclude
     private Set<Quiz> quizSet;
 
+    @ManyToMany
+    @JoinTable(name = "user_favorite_categories",
+            joinColumns = @JoinColumn(name = "user_id", columnDefinition = "bigint"),
+            inverseJoinColumns = @JoinColumn(name = "category_id", columnDefinition = "bigint"))
+    @ToString.Exclude
+    private Set<Category> favoriteCategories;
+
+    @Column(name = "accept_email")
+    private Boolean acceptNotificationEmail;
+
     private Boolean active = true;
 
     @Override

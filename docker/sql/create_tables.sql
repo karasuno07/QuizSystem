@@ -43,6 +43,7 @@ create table users
     email        varchar(255) not null constraint uk_6dotkott2kjsp8vw4d0m25fb7 unique,
     phone_number varchar(12),
     image        text,
+    accept_email boolean,
     active       boolean,
     role_id      bigint constraint fkp56c1712k691lhsyewcssf40f references roles
 );
@@ -74,14 +75,6 @@ create table questions
 
 alter table questions owner to postgres;
 
-create table answers
-(
-    id          bigserial not null primary key,
-    text        text   not null,
-    is_correct  boolean,
-    question_id bigint constraint fk3erw1a3t0r78st8ty27x6v3g1 references questions
-);
-
 create table users_quizzes
 (
     quiz_id            bigint not null constraint fk2pe7exldag7w0strpafrshmhh references quizzes,
@@ -94,7 +87,25 @@ create table users_quizzes
 
 alter table users_quizzes owner to postgres;
 
+create table answers
+(
+    id          bigserial not null primary key,
+    text        text   not null,
+    is_correct  boolean,
+    question_id bigint constraint fk3erw1a3t0r78st8ty27x6v3g1 references questions
+);
+
 alter table answers owner to postgres;
+
+create table user_favorite_categories
+(
+    user_id     bigint not null constraint fkgp05t4yjq3gdbapkiphxgg969 references users,
+    category_id bigint not null constraint fkb9wxwwc37eiapnigul3xrw0yt references categories,
+    primary key (user_id, category_id)
+);
+
+alter table user_favorite_categories owner to postgres;
+
 
 -- create audit tables
 create table revinfo
@@ -201,13 +212,14 @@ create table users_aud
     id           bigint  not null,
     rev          integer not null constraint fkc4vk4tui2la36415jpgm9leoq references revinfo,
     revtype      smallint,
-    active       boolean,
-    email        varchar(255),
-    full_name    varchar(100),
-    image        text,
-    password     varchar(80),
-    phone_number varchar(12),
     username     varchar(50),
+    password     varchar(80),
+    full_name    varchar(100),
+    email        varchar(255),
+    phone_number varchar(12),
+    image        text,
+    accept_email boolean,
+    active       boolean,
     role_id      bigint,
     primary key (id, rev)
 );
@@ -227,4 +239,20 @@ create table users_quizzes_aud
 );
 
 alter table users_quizzes_aud owner to postgres;
+
+create table user_favorite_categories_aud
+(
+    rev         integer not null constraint fk5nd0apy0u223bay6thjq2uyjb references revinfo,
+    user_id     bigint  not null,
+    category_id bigint  not null,
+    revtype     smallint,
+    primary key (rev, user_id, category_id)
+);
+
+alter table user_favorite_categories_aud owner to postgres;
+
+
+
+
+
 

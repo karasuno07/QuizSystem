@@ -25,7 +25,7 @@ public class CategoryController implements SecuredBearerTokenController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
 
-    @PostMapping("/all")
+    @PostMapping(value = "/find-all")
     ResponseEntity<?> getAllCategories(@RequestBody Optional<CategoryFilter> filter) {
         Page<CategoryResponse> responses = categoryService.findAllCategories(filter.orElse(new CategoryFilter()))
                                                           .map(categoryMapper::entityToCategoryResponse);
