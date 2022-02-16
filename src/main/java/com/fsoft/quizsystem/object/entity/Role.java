@@ -24,8 +24,4 @@ public class Role implements Serializable {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private SystemRole name;
-
-    public Role(SystemRole name) {
-        this.name = name;
-    }
 }

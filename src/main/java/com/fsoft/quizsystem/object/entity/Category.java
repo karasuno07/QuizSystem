@@ -31,10 +31,4 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL) @ToString.Exclude
     private Set<Quiz> quizzes;
-
-    public Category(String name, String slug, String image) {
-        this.name = name;
-        this.slug = slug;
-        this.image = image;
-    }
 }

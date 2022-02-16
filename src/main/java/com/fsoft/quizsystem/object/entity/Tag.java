@@ -26,8 +26,4 @@ public class Tag {
 
     @OneToMany(mappedBy = "tag") @ToString.Exclude
     private Set<Question> questions;
-
-    public Tag(String name) {
-        this.name = name;
-    }
 }

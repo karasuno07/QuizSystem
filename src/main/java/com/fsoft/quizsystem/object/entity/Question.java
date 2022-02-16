@@ -38,10 +38,4 @@ public class Question {
     private Difficulty difficulty;
 
     @ManyToOne @JoinColumn(name = "quiz_id") private Quiz quiz;
-
-    public void addAnswer(Answer answer) {
-        if (ObjectUtils.isEmpty(answers)) answers = new HashSet<>();
-        answers.add(answer);
-        answer.setQuestion(this);
-    }
 }

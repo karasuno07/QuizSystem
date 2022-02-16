@@ -49,10 +49,4 @@ public class Quiz {
     public void postPersist() {
         status = QuizStatus.DRAFT;
     }
-
-    public void addQuestion(Question question) {
-        if (ObjectUtils.isEmpty(questions)) questions = new HashSet<>();
-        questions.add(question);
-        question.setQuiz(this);
-    }
 }

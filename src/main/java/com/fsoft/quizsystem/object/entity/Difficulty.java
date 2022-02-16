@@ -32,9 +32,4 @@ public class Difficulty {
 
     @OneToMany(mappedBy = "difficulty") @ToString.Exclude
     private Set<Question> questions;
-
-    public Difficulty(DifficultyLevel level, DifficultyPoint point) {
-        this.level = level;
-        this.point = point;
-    }
 }
