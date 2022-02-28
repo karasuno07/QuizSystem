@@ -1,10 +1,10 @@
 package com.fsoft.quizsystem.object.dto.mapper;
 
-import com.fsoft.quizsystem.object.constant.SystemRole;
 import com.fsoft.quizsystem.object.dto.request.UserRequest;
 import com.fsoft.quizsystem.object.dto.response.AuthenticationInfo;
 import com.fsoft.quizsystem.object.dto.response.UserResponse;
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.es.UserES;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
@@ -23,6 +23,8 @@ public interface UserMapper {
 
     @Mapping(target = "fullName", ignore = true)
     void updateEntity(@MappingTarget User user, UserRequest request);
+
+    User esEntityToJpa(UserES entity);
 
     @AfterMapping
     default void mappingReqPropsToEntity(@MappingTarget User user, UserRequest request) {

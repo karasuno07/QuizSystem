@@ -1,18 +1,19 @@
 package com.fsoft.quizsystem.service;
 
-import com.fsoft.quizsystem.object.constant.SystemRole;
-import com.fsoft.quizsystem.object.entity.Role;
+import com.fsoft.quizsystem.object.dto.mapper.RoleMapper;
+import com.fsoft.quizsystem.object.entity.es.RoleES;
+import com.fsoft.quizsystem.object.entity.jpa.Role;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
-import com.fsoft.quizsystem.repository.RoleRepository;
+import com.fsoft.quizsystem.repository.es.RoleEsRepository;
+import com.fsoft.quizsystem.repository.jpa.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -20,18 +21,32 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final RoleEsRepository roleEsRepository;
+    private final RoleMapper roleMapper;
 
     public List<Role> findAllRoles() {
-        return roleRepository.findAll();
+        List<Role> roles;
+
+        if (roleEsRepository.count() > 0) {
+            roles = StreamSupport.stream(roleEsRepository.findAll().spliterator(), false)
+                                 .map(roleMapper::esEntityToJpa)
+                                 .collect(Collectors.toList());
+        } else {
+            roles = roleRepository.findAll();
+        }
+
+        return roles;
     }
 
     public Role findRoleById(Long id) {
-        return roleRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Not found any role with id " + id));
+        Optional<RoleES> optional = roleEsRepository.findById(id);
+
+        if (optional.isPresent()) {
+            return roleMapper.esEntityToJpa(optional.get());
+        } else {
+            return roleRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("Not found any role with id " + id));
+        }
     }
 
-    public Role findRoleByName(SystemRole name) {
-        return roleRepository.findByName(name).orElseThrow(
-                () -> new ResourceNotFoundException("Not found any role with name " + name));
-    }
 }

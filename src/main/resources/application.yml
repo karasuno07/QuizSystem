@@ -12,14 +12,16 @@ spring:
   redis:
     client-name: master
     password: fpt@123456
-    url: redis://localhost:5002
+    url: redis://localhost:6379
   data:
+    elasticsearch:
+      elastic-password: fpt@123456
     rest:
       base-path: /api
   datasource:
     driver-class-name: org.postgresql.Driver
     password: fpt@123456
-    url: jdbc:postgresql://localhost:5000/quiz-api-db
+    url: jdbc:postgresql://localhost:5432/quiz-api-db
     username: postgres
   jpa:
     hibernate:
@@ -36,6 +38,14 @@ spring:
             scope:
               - email
               - profile
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          elasticsearch:
+            client:
+              WIRE: TRACE
 token:
   jwt:
     secret-key: 3618bf61-a667-4139-ac23-4267323e6217

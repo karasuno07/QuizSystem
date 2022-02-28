@@ -8,7 +8,7 @@ values ('admin', '$2a$10$GpFenGLx8wUlhDULKOf9A.ho8XHzt1CoVxh3/1ZSgWCmnLx/Yl656',
        ('instructor1', '$2a$10$GpFenGLx8wUlhDULKOf9A.ho8XHzt1CoVxh3/1ZSgWCmnLx/Yl656', 'John Doe', 'john.doe@gmail.com', '0123456789', null, true, 2),
        ('guest1', '$2a$10$GpFenGLx8wUlhDULKOf9A.ho8XHzt1CoVxh3/1ZSgWCmnLx/Yl656', 'Mary Jane', 'mary.jane@gmail.com', '0123456789', null, true, null);
 
-insert into public.categories (id, name, slug, image)
+insert into public.categories (name, slug, image)
 values ('Development', 'development', 'https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/developement_zah93x.jpg'),
        ('Business', 'business', 'https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/business_niyc4b.jpg'),
        ('Design', 'design', 'https://res.cloudinary.com/fpt-software-quiz/image/upload/v1644660774/design_k3sin6.jpg'),

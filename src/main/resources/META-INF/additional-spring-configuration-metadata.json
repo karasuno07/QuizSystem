@@ -29,6 +29,11 @@
       "name": "spring.security.oauth2.client.redirectUrl",
       "type": "java.lang.String",
       "description": "Description for spring.security.oauth2.client.redirectUrl."
+    },
+    {
+      "name": "spring.data.elasticsearch.elastic-password",
+      "type": "java.lang.String",
+      "description": "Description for spring.data.elasticsearch.elastic-password."
     }
   ]
 }

@@ -2,7 +2,7 @@ package com.fsoft.quizsystem.object.dto.mapper;
 
 import com.fsoft.quizsystem.object.dto.request.AnswerRequest;
 import com.fsoft.quizsystem.object.dto.response.AnswerResponse;
-import com.fsoft.quizsystem.object.entity.Answer;
+import com.fsoft.quizsystem.object.entity.jpa.Answer;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;

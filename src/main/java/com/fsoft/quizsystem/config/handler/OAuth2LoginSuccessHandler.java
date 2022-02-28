@@ -1,6 +1,6 @@
 package com.fsoft.quizsystem.config.handler;
 
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import com.fsoft.quizsystem.object.oauth2.CustomOAuth2User;
 import com.fsoft.quizsystem.object.oauth2.OAuth2UserInfo;
 import com.fsoft.quizsystem.object.oauth2.OAuth2UserInfoFactory;

@@ -1,6 +1,6 @@
 package com.fsoft.quizsystem.config.listener;
 
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.event.spi.PostUpdateEvent;

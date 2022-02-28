@@ -1,6 +1,6 @@
 package com.fsoft.quizsystem.object.model;
 
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import lombok.Data;
 
 @Data

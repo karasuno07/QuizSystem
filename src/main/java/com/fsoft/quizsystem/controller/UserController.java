@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.Set;
 
 @CrossOrigin("*")
 @RestController
@@ -68,6 +69,15 @@ public class UserController implements SecuredBearerTokenController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("isAuthenticated() AND authentication.principal.id == #id")
+    @PutMapping(value = "/{id}/favorite-categories")
+    ResponseEntity<?> updateUserFavoriteCategories(@PathVariable Long id,
+                                                   @RequestBody Set<Long> categoryIds) {
+        userService.updateUserFavoriteCategories(id, categoryIds);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}/deactivate")
     ResponseEntity<?> deactivateUser(@PathVariable Long id) {
@@ -80,6 +90,22 @@ public class UserController implements SecuredBearerTokenController {
     @PatchMapping(value = "/{id}/activate")
     ResponseEntity<?> activateUser(@PathVariable Long id) {
         userService.activateUser(id);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("isAuthenticated() AND authentication.principal.id == #id")
+    @PatchMapping(value = "/{id}/subscribe-notification")
+    ResponseEntity<?> subscribeEmailNotification(@PathVariable Long id) {
+        userService.subscribeNotification(id);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("isAuthenticated() AND authentication.principal.id == #id")
+    @PatchMapping(value = "/{id}/unsubscribe-notification")
+    ResponseEntity<?> unsubscribeEmailNotification(@PathVariable Long id) {
+        userService.unsubscribeNotification(id);
 
         return ResponseEntity.ok().build();
     }

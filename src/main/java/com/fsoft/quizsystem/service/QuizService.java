@@ -5,28 +5,41 @@ import com.fsoft.quizsystem.object.dto.filter.QuizFilter;
 import com.fsoft.quizsystem.object.dto.mapper.QuizMapper;
 import com.fsoft.quizsystem.object.dto.request.QuizRequest;
 import com.fsoft.quizsystem.object.dto.response.AuthenticationInfo;
-import com.fsoft.quizsystem.object.entity.Category;
-import com.fsoft.quizsystem.object.entity.Quiz;
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.es.QuizES;
+import com.fsoft.quizsystem.object.entity.jpa.Category;
+import com.fsoft.quizsystem.object.entity.jpa.Quiz;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
 import com.fsoft.quizsystem.object.exception.UnauthorizedException;
 import com.fsoft.quizsystem.object.validation.RoleValidator;
-import com.fsoft.quizsystem.repository.QuizRepository;
-import com.fsoft.quizsystem.repository.spec.QuizSpecification;
+import com.fsoft.quizsystem.repository.es.QuizEsRepository;
+import com.fsoft.quizsystem.repository.jpa.QuizRepository;
+import com.fsoft.quizsystem.repository.jpa.spec.QuizSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.data.domain.Page;
+import org.springframework.data.elasticsearch.core.*;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class QuizService {
 
+    private final ElasticsearchOperations restTemplate;
+
     private final QuizRepository quizRepository;
+    private final QuizEsRepository quizEsRepository;
     private final QuizMapper quizMapper;
 
     private final CategoryService categoryService;
@@ -34,19 +47,46 @@ public class QuizService {
     private final CloudinaryService cloudinaryService;
 
     public Page<Quiz> findAllQuizzes(QuizFilter filter) {
-        Specification<Quiz> specification = QuizSpecification.getSpecification(filter);
+        Page<Quiz> quizzes;
 
-        return quizRepository.findAll(specification, filter.getPagination().getPageAndSort());
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if (!ObjectUtils.isEmpty(filter.getTitle())) {
+            query.should(QueryBuilders.matchQuery("title", filter.getTitle()));
+        }
+        if (!ObjectUtils.isEmpty(filter.getCategoryName())) {
+            query.should(QueryBuilders.matchQuery("category.name", filter.getCategoryName()));
+        }
+        if (!ObjectUtils.isEmpty(filter.getStatus())) {
+            query.should(QueryBuilders.termQuery("status", filter.getStatus()));
+        }
+
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(query)
+                .withPageable(filter.getPagination().getPageAndSort())
+                .build();
+        SearchHits<QuizES> hits = restTemplate.search(searchQuery, QuizES.class,
+                                                      IndexCoordinates.of("quizzes"));
+        if (hits.hasSearchHits()) {
+            SearchPage<QuizES> page = SearchHitSupport.searchPageFor(hits, filter.getPagination()
+                                                                                 .getPageAndSort());
+            quizzes = page.map(SearchHit::getContent).map(quizMapper::esEntityToJpa);
+        } else {
+            Specification<Quiz> specification = QuizSpecification.getSpecification(filter);
+            quizzes = quizRepository.findAll(specification, filter.getPagination().getPageAndSort());
+        }
+
+        return quizzes;
     }
 
     public Quiz findQuizById(long id) {
-        return quizRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Not found any quiz with id " + id));
-    }
+        Optional<QuizES> optional = quizEsRepository.findById(id);
 
-    public Quiz findQuizByTitle(String title) {
-        return quizRepository.findByTitle(title).orElseThrow(
-                () -> new ResourceNotFoundException("Not found any quiz with title " + title));
+        if (optional.isPresent()) {
+            return quizMapper.esEntityToJpa(optional.get());
+        } else {
+            return quizRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("Not found any quiz with id " + id));
+        }
     }
 
     public Quiz createQuiz(QuizRequest requestBody) {

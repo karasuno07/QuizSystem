@@ -3,15 +3,24 @@ package com.fsoft.quizsystem.service;
 import com.fsoft.quizsystem.object.dto.filter.UserFilter;
 import com.fsoft.quizsystem.object.dto.mapper.UserMapper;
 import com.fsoft.quizsystem.object.dto.request.UserRequest;
-import com.fsoft.quizsystem.object.entity.Role;
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.es.UserES;
+import com.fsoft.quizsystem.object.entity.jpa.Category;
+import com.fsoft.quizsystem.object.entity.jpa.Role;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import com.fsoft.quizsystem.object.exception.ResourceNotFoundException;
 import com.fsoft.quizsystem.object.oauth2.OAuth2UserInfo;
-import com.fsoft.quizsystem.repository.UserRepository;
-import com.fsoft.quizsystem.repository.spec.UserSpecification;
+import com.fsoft.quizsystem.repository.es.UserEsRepository;
+import com.fsoft.quizsystem.repository.jpa.UserRepository;
+import com.fsoft.quizsystem.repository.jpa.spec.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.data.domain.Page;
+import org.springframework.data.elasticsearch.core.*;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,20 +31,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.PostConstruct;
-import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class UserService implements UserDetailsService {
 
+    private final ElasticsearchOperations restTemplate;
+
     private final UserRepository userRepository;
+    private final UserEsRepository userEsRepository;
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
 
     private final RoleService roleService;
+    private final CategoryService categoryService;
     private final CloudinaryService cloudinaryService;
 
     @Override
@@ -44,23 +58,76 @@ public class UserService implements UserDetailsService {
     }
 
     public Page<User> findAllUsers(UserFilter filter) {
-        Specification<User> specification = UserSpecification.getSpecification(filter);
-        return userRepository.findAll(specification, filter.getPagination().getPageAndSort());
+        Page<User> users;
+
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if (!ObjectUtils.isEmpty(filter.getUsername())) {
+            query.should(QueryBuilders.termQuery("username", filter.getUsername()));
+        }
+        if (!ObjectUtils.isEmpty(filter.getFullName())) {
+            query.should(QueryBuilders.matchQuery("full_name", filter.getFullName()));
+        }
+        if (!ObjectUtils.isEmpty(filter.getEmail())) {
+            query.should(QueryBuilders.matchQuery("email", filter.getEmail()));
+        }
+        if (!ObjectUtils.isEmpty(filter.getPhoneNumber())) {
+            query.should(QueryBuilders.matchQuery("phone_number", filter.getPhoneNumber()));
+        }
+        if (!ObjectUtils.isEmpty(filter.getActive())) {
+            query.should(QueryBuilders.matchBoolPrefixQuery("active", filter.getActive()));
+        }
+
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(query)
+                .withPageable(filter.getPagination().getPageAndSort())
+                .build();
+        SearchHits<UserES> hits = restTemplate.search(searchQuery, UserES.class,
+                                                      IndexCoordinates.of("users"));
+        if (hits.hasSearchHits()) {
+            SearchPage<UserES> page = SearchHitSupport.searchPageFor(hits, filter.getPagination()
+                                                                                 .getPageAndSort());
+
+            users = page.map(SearchHit::getContent).map(userMapper::esEntityToJpa);
+        } else {
+            Specification<User> specification = UserSpecification.getSpecification(filter);
+            users = userRepository.findAll(specification, filter.getPagination().getPageAndSort());
+        }
+
+        return users;
     }
 
     public User findUserById(long id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Not found any user with id " + id));
+        Optional<UserES> optional = userEsRepository.findById(id);
+
+        if (optional.isPresent()) {
+            return userMapper.esEntityToJpa(optional.get());
+        } else {
+            return userRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("Not found any user with id " + id));
+        }
+
     }
 
     public User findUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(
-                () -> new BadCredentialsException("User " + username + " not found"));
+        Optional<UserES> optional = userEsRepository.findByUsername(username);
+
+        if (optional.isPresent()) {
+            return userMapper.esEntityToJpa(optional.get());
+        } else {
+            return userRepository.findByUsername(username).orElseThrow(
+                    () -> new BadCredentialsException("User " + username + " not found"));
+        }
     }
 
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(
-                () -> new BadCredentialsException("User " + email + " not found"));
+        Optional<UserES> optional = userEsRepository.findByEmail(email);
+
+        if (optional.isPresent()) {
+            return userMapper.esEntityToJpa(optional.get());
+        } else {
+            return userRepository.findByEmail(email).orElseThrow(
+                    () -> new BadCredentialsException("User " + email + " not found"));
+        }
     }
 
     public User createUser(UserRequest requestBody) {
@@ -130,10 +197,35 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean validateConcurrentUsername(String username) {
-        return !userRepository.existsByUsername(username);
+        return !(userEsRepository.existsByUsername(username)  || userRepository.existsByUsername(username));
     }
 
     public boolean validateConcurrentEmail(String email) {
-        return !userRepository.existsByEmail(email);
+        return !(userEsRepository.existsByEmail(email) || userRepository.existsByEmail(email));
+    }
+
+    public void updateUserFavoriteCategories(Long userId, Set<Long> categoryIds) {
+        User user = this.findUserById(userId);
+        if (ObjectUtils.isEmpty(categoryIds)) {
+            user.getFavoriteCategories().clear();
+        } else {
+            Set<Category> set = categoryIds.stream()
+                                           .map(categoryService::findCategoryById)
+                                           .collect(Collectors.toSet());
+            user.setFavoriteCategories(set);
+        }
+        userRepository.save(user);
+    }
+
+    public void subscribeNotification(Long id) {
+        User user = this.findUserById(id);
+        user.setNotification(true);
+        userRepository.save(user);
+    }
+
+    public void unsubscribeNotification(Long id) {
+        User user = this.findUserById(id);
+        user.setNotification(false);
+        userRepository.save(user);
     }
 }

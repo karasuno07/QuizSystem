@@ -1,0 +1,16 @@
+- pipeline.id: roles_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-roles-sync.conf"
+- pipeline.id: users_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-users-sync.conf"
+- pipeline.id: categories_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-categories-sync.conf"
+- pipeline.id: difficulties_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-difficulties-sync.conf"
+- pipeline.id: tags_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-tags-sync.conf"
+- pipeline.id: quizzes_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-quizzes-sync.conf"
+- pipeline.id: questions_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-questions-sync.conf"
+- pipeline.id: answers_pineline
+  path.config: "/usr/share/logstash/pipeline/jdbc-answers-sync.conf"

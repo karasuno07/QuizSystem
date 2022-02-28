@@ -1,6 +1,6 @@
 package com.fsoft.quizsystem.object.validation;
 
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public final class RoleValidator {

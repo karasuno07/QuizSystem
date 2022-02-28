@@ -1,35 +1,155 @@
 version: '3.9'
+networks:
+  elk-net:
+    driver: bridge
 volumes:
-  db-data:
-    name: postgres-db-volume
-  cache-data:
-    name: redis-volume
+  postgres-db:
+    name: postgres-volume
+  elk-setup:
+    name: elk-setup-volume
+  elasticsearch:
+    name: elasticsearch-volume
 services:
-  db:
+  postgres:
+    container_name: postgresql
     image: postgres
     restart: always
     ports:
-      - "5000:5432"
-    env_file:
-      - database.env
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - postgres-db:/var/lib/postgresql/data
       # copy the sql script to create tables
       - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
       # copy the sql script to fill tables
       - ./sql/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+    networks:
+      - elk-net
   adminer:
+    container_name: adminer
     image: adminer
     restart: always
     ports:
-      - "5001:8080"
-  cache:
+      - "9000:8080"
+    networks:
+      - elk-net
+  redis:
+    container_name: redis
     image: redis
     restart: always
     command: redis-server --requirepass fpt@123456
     ports:
-      - "5002:6379"
+      - "6379:6379"
     environment:
       - REDIS_RELICATION_MODE=master
+    networks:
+      - elk-net
+  # elastic-stack
+  elk-setup:
+    container_name: elk-setup
+    build:
+      context: setup/
+      args:
+        ELK_VERSION: ${ELK_VERSION}
     volumes:
-      - cache-data:/data
+      - elk-setup:/state:Z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    networks:
+      - elk-net
+
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    restart: always
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
+      - elasticsearch:/usr/share/elasticsearch/data:z
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: -Xmx256m -Xms256m
+      # Bootstrap password.
+      # Used to initialize the keystore during the initial startup of
+      # Elasticsearch. Ignored on subsequent runs.
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks.
+      # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    networks:
+      - elk-net
+
+  logstash:
+    container_name: logstash
+    build:
+      context: logstash/
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    restart: always
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/config/pipelines.yml
+        target: /usr/share/logstash/config/pipelines.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: -Xmx256m -Xms256m
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      LOGSTASH_JDBC_URL: ${LOGSTASH_JDBC_URL}
+      LOGSTASH_JDBC_DRIVER: ${LOGSTASH_JDBC_DRIVER}
+      LOGSTASH_JDBC_DRIVER_JAR_LOCATION: ${LOGSTASH_JDBC_DRIVER_JAR_LOCATION}
+      LOGSTASH_ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST}
+      LOGSTASH_JDBC_USERNAME: ${POSTGRES_USER}
+      LOGSTASH_JDBC_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - elk-net
+    depends_on:
+      - elasticsearch
+      - kibana
+      - postgres
+
+  kibana:
+    container_name: kibana
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    restart: always
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - "5601:5601"
+    environment:
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      KIBANA_ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST}
+      ENCRYPTED_KEY: ${ELK_ENCCRYPTED_KEY:-}
+    networks:
+      - elk-net
+    depends_on:
+      - elasticsearch
+
+

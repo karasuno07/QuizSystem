@@ -4,7 +4,7 @@ import com.fsoft.quizsystem.object.dto.mapper.UserMapper;
 import com.fsoft.quizsystem.object.dto.request.AuthenticationRequest;
 import com.fsoft.quizsystem.object.dto.response.TokenResponse;
 import com.fsoft.quizsystem.object.dto.response.UserResponse;
-import com.fsoft.quizsystem.object.entity.User;
+import com.fsoft.quizsystem.object.entity.jpa.User;
 import com.fsoft.quizsystem.object.model.RefreshToken;
 import com.fsoft.quizsystem.service.JwtService;
 import lombok.RequiredArgsConstructor;
